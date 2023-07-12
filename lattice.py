@@ -7,7 +7,8 @@ class lattice:
     def __init__(self, a1, a2):
         """Initializes the lattice with the vectors a1 and a2 of the parallelogram"""
         a1, a2 = np.array(a1), np.array(a2)
-        self.a1, self. a2 = a1, a2
+        self.a1, self.a2 = a1, a2
+        self.amat = np.array([a1, a2])
         self.area = np.abs(a1.dot(a2))
         self.angle = np.arccos(a1.dot(a2)/(np.linalg.norm(a1)*np.linalg.norm(a2)))
     
@@ -48,4 +49,35 @@ class lattice:
                 cell_y = vertices_y + i*self.a1[1] + j*self.a2[1]
                 ax.add_patch(patches.Polygon(xy=list(zip(cell_x, cell_y)), fill=False))
 
-        plt.title('Plot of the ' + str(n) + 'x' + str(m) + ' lattice of [' + str(self.a1) + str(self.a2) + ']')
+        plt.title('Plot of the ' + str(n) + 'x' + str(m) + ' lattice of ' + str(self.amat))
+
+    def plot_supercell(self, n, n_, m, m_):
+        """Plots a supercell of the lattice"""
+        tmat = np.array([[n, n_], [m, m_]])
+        #Calculating the coordinates of the vertices of the supercell
+        super_x, super_y = np.array([[0, 0], tmat[0], tmat[0]+tmat[1], tmat[1]]).dot(self.amat.T).T
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, aspect='equal')
+        ax.add_patch(patches.Polygon(xy=list(zip(super_x, super_y)), fill=False))
+
+        #Defining the margin manually to ensure entire plot is visible
+        margin = 0.1 * min(max(super_x) - min(super_x), max(super_y) - min(super_y))
+        ax.set_xlim(min(super_x) - margin, max(super_x) + margin)
+        ax.set_ylim(min(super_y) - margin, max(super_y) + margin)
+
+        plt.title('Plot of the ' + str(tmat) + ' supercell of ' + str(self.amat))
+
+        site_x, site_y = [], []
+
+        for i in range(-(abs(n) + abs(m)), abs(n) + abs(m)):
+            for j in range(-(abs(n_) + abs(m_)), abs(n_) + abs(m_)):
+                #Checking if the site is inside the supercell
+                spvec = np.linalg.inv(tmat.T).dot(np.array([i, j]).T)
+                if 0 <= spvec[0] < 1 and 0 <= spvec[1] < 1:
+                    #Calculating the real coordinates of the site
+                    x, y = self.amat.dot(np.array([i, j])).T
+                    site_x.append(x)
+                    site_y.append(y)
+
+        ax.scatter(site_x, site_y, color='r')
