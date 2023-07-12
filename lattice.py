@@ -62,7 +62,7 @@ class lattice:
         ax.add_patch(patches.Polygon(xy=list(zip(super_x, super_y)), fill=False))
 
         #Defining the margin manually to ensure entire plot is visible
-        margin = 0.1 * min(max(super_x) - min(super_x), max(super_y) - min(super_y))
+        margin = min(max(super_x) - min(super_x), max(super_y) - min(super_y))
         ax.set_xlim(min(super_x) - margin, max(super_x) + margin)
         ax.set_ylim(min(super_y) - margin, max(super_y) + margin)
 
