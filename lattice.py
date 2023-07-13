@@ -11,6 +11,11 @@ class lattice:
         self.amat = np.array([a1, a2])
         self.area = np.abs(a1.dot(a2))
         self.angle = np.arccos(a1.dot(a2)/(np.linalg.norm(a1)*np.linalg.norm(a2)))
+
+        #reciprocal lattice vectors 
+        factor = 2*np.pi/(a1[0]*a2[1] - a1[1]*a2[0])
+        self.b1 = factor*np.array([a2[1], -a1[1]])
+        self.b2 = factor*np.array([-a2[0], a1[0]])
     
     def plot_unit(self):
         """Plots the unit cell of the lattice"""
